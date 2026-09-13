@@ -5,7 +5,7 @@ import { z } from "zod";
 function createServer() {
   const server = new McpServer({
     name: "Polvo Digital MCP Gateway",
-    version: "1.0.0",
+    version: "1.1.0",
   });
 
   server.registerTool(
@@ -23,6 +23,25 @@ function createServer() {
           text: mensagem
             ? `🐙 Polvo Digital MCP está ONLINE. Mensagem recebida: ${mensagem}`
             : "🐙 Polvo Digital MCP está ONLINE e pronto para receber ferramentas.",
+        },
+      ],
+    }),
+  );
+
+  server.registerTool(
+    "polvo_echo",
+    {
+      description:
+        "Repete uma mensagem recebida para testar a comunicação entre o Claude e o Polvo Digital.",
+      inputSchema: {
+        mensagem: z.string(),
+      },
+    },
+    async ({ mensagem }) => ({
+      content: [
+        {
+          type: "text",
+          text: `🐙 Eco do Polvo: ${mensagem}`,
         },
       ],
     }),
