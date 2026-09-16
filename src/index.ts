@@ -158,7 +158,44 @@ function createServer(env: any) {
 }
 
 export default {
-  fetch(request, env, ctx) {
+  async fetch(request: Request, env: any, ctx: any) {
+    const url = new URL(request.url);
+
+    // 🐙🎵 Callback OAuth do TikTok for Business
+    if (url.pathname === "/oauth/tiktok/callback") {
+      const code = url.searchParams.get("code");
+      const error = url.searchParams.get("error");
+
+      if (error) {
+        return new Response(
+          `🐙⚠️ TikTok não autorizou a conexão.\nErro: ${error}`,
+          {
+            status: 400,
+            headers: { "Content-Type": "text/plain; charset=utf-8" },
+          },
+        );
+      }
+
+      if (!code) {
+        return new Response(
+          "🐙 TikTok Lab: callback ONLINE. Aguardando autorização.",
+          {
+            status: 200,
+            headers: { "Content-Type": "text/plain; charset=utf-8" },
+          },
+        );
+      }
+
+      return new Response(
+        "🐙🎵 TikTok autorizou o Polvo e enviou o código de autorização. Próxima etapa: troca segura por tokens.",
+        {
+          status: 200,
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
+        },
+      );
+    }
+
+    // Mantém o MCP atual funcionando normalmente
     return createMcpHandler(() => createServer(env))(request, env, ctx);
   },
 };
