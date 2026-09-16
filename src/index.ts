@@ -1,6 +1,7 @@
 import { createMcpHandler } from "agents/mcp/server";
 import { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
+import { registerTikTokClient } from "./tiktok";
 
 const POLVO_VERSION = "1.3.0";
 const POLVO_AI_MODEL = "@cf/zai-org/glm-4.7-flash";
@@ -160,6 +161,31 @@ function createServer(env: any) {
 export default {
   async fetch(request: Request, env: any, ctx: any) {
     const url = new URL(request.url);
+
+    // 🧪 TikTok Lab — registro DCR temporário
+    if (url.pathname === "/lab/tiktok/register") {
+      try {
+        const registration: any = await registerTikTokClient();
+
+        return Response.json({
+          ok: true,
+          message: "🐙🎵 Polvo registrado no TikTok MCP com sucesso.",
+          client_id: registration.client_id,
+        });
+      } catch (error) {
+        const detalhe =
+          error instanceof Error ? error.message : String(error);
+
+        return Response.json(
+          {
+            ok: false,
+            message: "🐙⚠️ Falha no registro DCR do TikTok.",
+            detalhe,
+          },
+          { status: 500 },
+        );
+      }
+    }
 
     // 🐙🎵 Callback OAuth do TikTok for Business
     if (url.pathname === "/oauth/tiktok/callback") {
